@@ -1,6 +1,14 @@
+# LLM host
 google-genai>=0.2.0
+python-dotenv>=1.0.0
+
+# Protocol layer (JSON-RPC / MCP are implemented by hand, no MCP SDK)
 pydantic>=2.5.0
+
+# Terminal UI
 textual>=0.50.0
 rich>=13.7.0
-python-dotenv>=1.0.0
+
+# Tests
 pytest>=8.0.0
+pytest-asyncio>=0.23.0
