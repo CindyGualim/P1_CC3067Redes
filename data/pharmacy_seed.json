@@ -1,0 +1,737 @@
+{
+  "currency": "GTQ",
+  "tax_rate": 0.12,
+  "branches": [
+    {
+      "id": "SUC-01",
+      "name": "Farmacia Vida Zona 10",
+      "address": "6a Avenida 12-45, Zona 10, Ciudad de Guatemala",
+      "phone": "+502 2233-4455"
+    },
+    {
+      "id": "SUC-02",
+      "name": "Farmacia Vida Zona 1",
+      "address": "9a Calle 5-20, Zona 1, Ciudad de Guatemala",
+      "phone": "+502 2233-4466"
+    },
+    {
+      "id": "SUC-03",
+      "name": "Farmacia Vida Mixco",
+      "address": "Calzada San Juan 8-11, Mixco",
+      "phone": "+502 2233-4477"
+    }
+  ],
+  "medicines": [
+    {
+      "sku": "MED-001",
+      "name": "Acetaminofen 500 mg",
+      "active_ingredient": "Acetaminofen",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 18.5,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Analgesico",
+      "symptoms": [
+        "dolor de cabeza",
+        "fiebre",
+        "dolor muscular",
+        "dolor de garganta"
+      ],
+      "contraindications": "No exceder 4 g al dia. Evitar con enfermedad hepatica o consumo de alcohol."
+    },
+    {
+      "sku": "MED-002",
+      "name": "Ibuprofeno 400 mg",
+      "active_ingredient": "Ibuprofeno",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 24.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Antiinflamatorio",
+      "symptoms": [
+        "dolor de cabeza",
+        "fiebre",
+        "dolor muscular",
+        "colico menstrual",
+        "inflamacion"
+      ],
+      "contraindications": "Evitar con ulcera gastrica, insuficiencia renal o en el tercer trimestre de embarazo."
+    },
+    {
+      "sku": "MED-003",
+      "name": "Loratadina 10 mg",
+      "active_ingredient": "Loratadina",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 22.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Antihistaminico",
+      "symptoms": [
+        "alergia",
+        "estornudos",
+        "congestion nasal",
+        "comezon"
+      ],
+      "contraindications": "Precaucion en insuficiencia hepatica. No recomendado en menores de 2 anios."
+    },
+    {
+      "sku": "MED-004",
+      "name": "Omeprazol 20 mg",
+      "active_ingredient": "Omeprazol",
+      "presentation": "Caja de 14 capsulas",
+      "form": "capsula",
+      "unit_price": 45.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Gastrico",
+      "symptoms": [
+        "acidez",
+        "reflujo",
+        "gastritis",
+        "dolor de estomago"
+      ],
+      "contraindications": "El uso prolongado sin supervision puede enmascarar sintomas de cancer gastrico."
+    },
+    {
+      "sku": "MED-005",
+      "name": "Amoxicilina 500 mg",
+      "active_ingredient": "Amoxicilina",
+      "presentation": "Caja de 15 capsulas",
+      "form": "capsula",
+      "unit_price": 68.0,
+      "requires_prescription": true,
+      "controlled": false,
+      "category": "Antibiotico",
+      "symptoms": [
+        "infeccion bacteriana",
+        "dolor de garganta",
+        "infeccion respiratoria",
+        "infeccion urinaria"
+      ],
+      "contraindications": "Contraindicado con alergia a penicilinas. Completar el tratamiento indicado."
+    },
+    {
+      "sku": "MED-006",
+      "name": "Azitromicina 500 mg",
+      "active_ingredient": "Azitromicina",
+      "presentation": "Caja de 3 tabletas",
+      "form": "tableta",
+      "unit_price": 95.0,
+      "requires_prescription": true,
+      "controlled": false,
+      "category": "Antibiotico",
+      "symptoms": [
+        "infeccion bacteriana",
+        "infeccion respiratoria",
+        "bronquitis"
+      ],
+      "contraindications": "Precaucion en pacientes con arritmias o prolongacion del intervalo QT."
+    },
+    {
+      "sku": "MED-007",
+      "name": "Salbutamol inhalador 100 mcg",
+      "active_ingredient": "Salbutamol",
+      "presentation": "Inhalador de 200 dosis",
+      "form": "inhalador",
+      "unit_price": 120.0,
+      "requires_prescription": true,
+      "controlled": false,
+      "category": "Respiratorio",
+      "symptoms": [
+        "dificultad para respirar",
+        "asma",
+        "sibilancias",
+        "tos seca"
+      ],
+      "contraindications": "Precaucion en hipertiroidismo y enfermedad cardiaca. No exceder la dosis indicada."
+    },
+    {
+      "sku": "MED-008",
+      "name": "Metformina 850 mg",
+      "active_ingredient": "Metformina",
+      "presentation": "Caja de 30 tabletas",
+      "form": "tableta",
+      "unit_price": 55.0,
+      "requires_prescription": true,
+      "controlled": false,
+      "category": "Antidiabetico",
+      "symptoms": [
+        "diabetes",
+        "azucar alta"
+      ],
+      "contraindications": "Contraindicado en insuficiencia renal severa. Suspender antes de estudios con contraste."
+    },
+    {
+      "sku": "MED-009",
+      "name": "Losartan 50 mg",
+      "active_ingredient": "Losartan potasico",
+      "presentation": "Caja de 30 tabletas",
+      "form": "tableta",
+      "unit_price": 62.0,
+      "requires_prescription": true,
+      "controlled": false,
+      "category": "Antihipertensivo",
+      "symptoms": [
+        "presion alta",
+        "hipertension"
+      ],
+      "contraindications": "Contraindicado en el embarazo. Vigilar el potasio serico."
+    },
+    {
+      "sku": "MED-010",
+      "name": "Ambroxol jarabe 15 mg/5 ml",
+      "active_ingredient": "Ambroxol",
+      "presentation": "Frasco de 120 ml",
+      "form": "jarabe",
+      "unit_price": 38.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Respiratorio",
+      "symptoms": [
+        "tos",
+        "tos con flema",
+        "congestion en el pecho"
+      ],
+      "contraindications": "Precaucion en ulcera gastrica. Consultar antes de usarlo en menores de 2 anios."
+    },
+    {
+      "sku": "MED-011",
+      "name": "Sales de rehidratacion oral",
+      "active_ingredient": "Electrolitos orales",
+      "presentation": "Sobre de 27.9 g",
+      "form": "polvo",
+      "unit_price": 12.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Rehidratacion",
+      "symptoms": [
+        "diarrea",
+        "deshidratacion",
+        "vomito"
+      ],
+      "contraindications": "Disolver en 1 litro de agua potable. No hervir la solucion ya preparada."
+    },
+    {
+      "sku": "MED-012",
+      "name": "Loperamida 2 mg",
+      "active_ingredient": "Loperamida",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 28.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Antidiarreico",
+      "symptoms": [
+        "diarrea"
+      ],
+      "contraindications": "No usar si hay fiebre alta o sangre en las heces. No recomendado en menores de 6 anios."
+    },
+    {
+      "sku": "MED-013",
+      "name": "Clonazepam 2 mg",
+      "active_ingredient": "Clonazepam",
+      "presentation": "Caja de 30 tabletas",
+      "form": "tableta",
+      "unit_price": 85.0,
+      "requires_prescription": true,
+      "controlled": true,
+      "category": "Psicotropico",
+      "symptoms": [
+        "ansiedad",
+        "insomnio",
+        "crisis convulsivas"
+      ],
+      "contraindications": "Medicamento controlado. Riesgo de dependencia. No combinar con alcohol."
+    },
+    {
+      "sku": "MED-014",
+      "name": "Tramadol 50 mg",
+      "active_ingredient": "Tramadol clorhidrato",
+      "presentation": "Caja de 10 capsulas",
+      "form": "capsula",
+      "unit_price": 78.0,
+      "requires_prescription": true,
+      "controlled": true,
+      "category": "Analgesico opioide",
+      "symptoms": [
+        "dolor severo",
+        "dolor postoperatorio"
+      ],
+      "contraindications": "Medicamento controlado. Riesgo de depresion respiratoria y dependencia."
+    },
+    {
+      "sku": "MED-015",
+      "name": "Cetirizina 10 mg",
+      "active_ingredient": "Cetirizina",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 26.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Antihistaminico",
+      "symptoms": [
+        "alergia",
+        "urticaria",
+        "comezon",
+        "congestion nasal"
+      ],
+      "contraindications": "Puede causar somnolencia. Precaucion al conducir o manejar maquinaria."
+    },
+    {
+      "sku": "MED-016",
+      "name": "Naproxeno 250 mg",
+      "active_ingredient": "Naproxeno sodico",
+      "presentation": "Caja de 10 tabletas",
+      "form": "tableta",
+      "unit_price": 32.0,
+      "requires_prescription": false,
+      "controlled": false,
+      "category": "Antiinflamatorio",
+      "symptoms": [
+        "dolor muscular",
+        "dolor de espalda",
+        "colico menstrual",
+        "inflamacion"
+      ],
+      "contraindications": "Evitar con ulcera gastrica o insuficiencia renal. Tomar con alimentos."
+    }
+  ],
+  "inventory": [
+    {
+      "sku": "MED-001",
+      "branch_id": "SUC-01",
+      "stock": 120,
+      "lot": "L00101",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-001",
+      "branch_id": "SUC-02",
+      "stock": 80,
+      "lot": "L00102",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-001",
+      "branch_id": "SUC-03",
+      "stock": 45,
+      "lot": "L00103",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-002",
+      "branch_id": "SUC-01",
+      "stock": 95,
+      "lot": "L00201",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-002",
+      "branch_id": "SUC-02",
+      "stock": 60,
+      "lot": "L00202",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-002",
+      "branch_id": "SUC-03",
+      "stock": 30,
+      "lot": "L00203",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-003",
+      "branch_id": "SUC-01",
+      "stock": 70,
+      "lot": "L00301",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-003",
+      "branch_id": "SUC-02",
+      "stock": 25,
+      "lot": "L00302",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-003",
+      "branch_id": "SUC-03",
+      "stock": 18,
+      "lot": "L00303",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-004",
+      "branch_id": "SUC-01",
+      "stock": 54,
+      "lot": "L00401",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-004",
+      "branch_id": "SUC-02",
+      "stock": 40,
+      "lot": "L00402",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-004",
+      "branch_id": "SUC-03",
+      "stock": 12,
+      "lot": "L00403",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-005",
+      "branch_id": "SUC-01",
+      "stock": 35,
+      "lot": "L00501",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-005",
+      "branch_id": "SUC-02",
+      "stock": 0,
+      "lot": "L00502",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-005",
+      "branch_id": "SUC-03",
+      "stock": 22,
+      "lot": "L00503",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-006",
+      "branch_id": "SUC-01",
+      "stock": 18,
+      "lot": "L00601",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-006",
+      "branch_id": "SUC-02",
+      "stock": 14,
+      "lot": "L00602",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-006",
+      "branch_id": "SUC-03",
+      "stock": 0,
+      "lot": "L00603",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-007",
+      "branch_id": "SUC-01",
+      "stock": 12,
+      "lot": "L00701",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-007",
+      "branch_id": "SUC-02",
+      "stock": 6,
+      "lot": "L00702",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-007",
+      "branch_id": "SUC-03",
+      "stock": 4,
+      "lot": "L00703",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-008",
+      "branch_id": "SUC-01",
+      "stock": 60,
+      "lot": "L00801",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-008",
+      "branch_id": "SUC-02",
+      "stock": 33,
+      "lot": "L00802",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-008",
+      "branch_id": "SUC-03",
+      "stock": 27,
+      "lot": "L00803",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-009",
+      "branch_id": "SUC-01",
+      "stock": 48,
+      "lot": "L00901",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-009",
+      "branch_id": "SUC-02",
+      "stock": 21,
+      "lot": "L00902",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-009",
+      "branch_id": "SUC-03",
+      "stock": 15,
+      "lot": "L00903",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-010",
+      "branch_id": "SUC-01",
+      "stock": 40,
+      "lot": "L01001",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-010",
+      "branch_id": "SUC-02",
+      "stock": 36,
+      "lot": "L01002",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-010",
+      "branch_id": "SUC-03",
+      "stock": 20,
+      "lot": "L01003",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-011",
+      "branch_id": "SUC-01",
+      "stock": 200,
+      "lot": "L01101",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-011",
+      "branch_id": "SUC-02",
+      "stock": 150,
+      "lot": "L01102",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-011",
+      "branch_id": "SUC-03",
+      "stock": 90,
+      "lot": "L01103",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-012",
+      "branch_id": "SUC-01",
+      "stock": 65,
+      "lot": "L01201",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-012",
+      "branch_id": "SUC-02",
+      "stock": 44,
+      "lot": "L01202",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-012",
+      "branch_id": "SUC-03",
+      "stock": 25,
+      "lot": "L01203",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-013",
+      "branch_id": "SUC-01",
+      "stock": 8,
+      "lot": "L01301",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-013",
+      "branch_id": "SUC-02",
+      "stock": 0,
+      "lot": "L01302",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-013",
+      "branch_id": "SUC-03",
+      "stock": 0,
+      "lot": "L01303",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-014",
+      "branch_id": "SUC-01",
+      "stock": 10,
+      "lot": "L01401",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-014",
+      "branch_id": "SUC-02",
+      "stock": 5,
+      "lot": "L01402",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-014",
+      "branch_id": "SUC-03",
+      "stock": 0,
+      "lot": "L01403",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-015",
+      "branch_id": "SUC-01",
+      "stock": 58,
+      "lot": "L01501",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-015",
+      "branch_id": "SUC-02",
+      "stock": 41,
+      "lot": "L01502",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-015",
+      "branch_id": "SUC-03",
+      "stock": 33,
+      "lot": "L01503",
+      "expiry_date": "2026-12-31"
+    },
+    {
+      "sku": "MED-016",
+      "branch_id": "SUC-01",
+      "stock": 72,
+      "lot": "L01601",
+      "expiry_date": "2027-06-30"
+    },
+    {
+      "sku": "MED-016",
+      "branch_id": "SUC-02",
+      "stock": 50,
+      "lot": "L01602",
+      "expiry_date": "2027-03-31"
+    },
+    {
+      "sku": "MED-016",
+      "branch_id": "SUC-03",
+      "stock": 28,
+      "lot": "L01603",
+      "expiry_date": "2026-12-31"
+    }
+  ],
+  "prescriptions": [
+    {
+      "folio": "RX-2026-0001",
+      "patient_name": "Ana Lucia Morales",
+      "patient_id": "2547891230101",
+      "doctor_name": "Dr. Carlos Estrada",
+      "doctor_license": "COL-12345",
+      "issued_at": "2026-08-10",
+      "expires_at": "2026-09-09",
+      "status": "active",
+      "diagnosis": "Faringitis bacteriana",
+      "items": [
+        {
+          "sku": "MED-005",
+          "quantity_prescribed": 1,
+          "quantity_dispensed": 0
+        },
+        {
+          "sku": "MED-010",
+          "quantity_prescribed": 1,
+          "quantity_dispensed": 0
+        }
+      ]
+    },
+    {
+      "folio": "RX-2026-0002",
+      "patient_name": "Jorge Ramirez Lopez",
+      "patient_id": "1987654320101",
+      "doctor_name": "Dra. Ingrid Castillo",
+      "doctor_license": "COL-18420",
+      "issued_at": "2026-05-01",
+      "expires_at": "2026-05-31",
+      "status": "active",
+      "diagnosis": "Bronquitis aguda",
+      "items": [
+        {
+          "sku": "MED-006",
+          "quantity_prescribed": 1,
+          "quantity_dispensed": 0
+        }
+      ]
+    },
+    {
+      "folio": "RX-2026-0003",
+      "patient_name": "Maria Jose Suchite",
+      "patient_id": "3012457890101",
+      "doctor_name": "Dr. Otto Marroquin",
+      "doctor_license": "COL-09876",
+      "issued_at": "2026-07-15",
+      "expires_at": "2026-10-13",
+      "status": "dispensed",
+      "diagnosis": "Diabetes mellitus tipo 2",
+      "items": [
+        {
+          "sku": "MED-008",
+          "quantity_prescribed": 2,
+          "quantity_dispensed": 2
+        }
+      ]
+    },
+    {
+      "folio": "RX-2026-0004",
+      "patient_name": "Luis Fernando Ordonez",
+      "patient_id": "2233445560101",
+      "doctor_name": "Dra. Silvia Palma",
+      "doctor_license": "COL-20987",
+      "issued_at": "2026-08-18",
+      "expires_at": "2026-09-01",
+      "status": "active",
+      "diagnosis": "Trastorno de ansiedad generalizada",
+      "items": [
+        {
+          "sku": "MED-013",
+          "quantity_prescribed": 1,
+          "quantity_dispensed": 0
+        }
+      ]
+    },
+    {
+      "folio": "RX-2026-0005",
+      "patient_name": "Ana Lucia Morales",
+      "patient_id": "2547891230101",
+      "doctor_name": "Dr. Carlos Estrada",
+      "doctor_license": "COL-12345",
+      "issued_at": "2026-08-01",
+      "expires_at": "2026-10-30",
+      "status": "active",
+      "diagnosis": "Hipertension arterial",
+      "items": [
+        {
+          "sku": "MED-009",
+          "quantity_prescribed": 3,
+          "quantity_dispensed": 1
+        }
+      ]
+    }
+  ]
+}

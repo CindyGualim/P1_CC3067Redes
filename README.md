@@ -34,13 +34,21 @@ src/core/
   logging_setup.py      diagnostic logging (file + console)
   transport/
     base.py             Transport interface (stdio now, HTTP in delivery 2)
-    stdio.py            runs an MCP server as a child process
+    stdio.py            client side: runs an MCP server as a child process
+    stdio_server.py     server side: stdin/stdout loop
   mcp/
     types.py            MCP data model and method names
     client.py           session: handshake, id correlation, tools
+    server.py           tool registry, dispatch, schema validation
     protocol_log.py     audit log of every MCP message (requirement #3)
-tests/                  unit tests + end-to-end session against a mock server
-scripts/demo_protocol.py  prints a full annotated session
+src/servers/pharmacy/
+  __main__.py           entry point of the pharmacy server
+  tools.py              the seven tools and their JSON Schemas
+  database.py           SQLite layer and the business rules
+data/pharmacy_seed.json catalogue, inventory and prescriptions
+docs/                   server specification
+tests/                  unit, dispatch and end-to-end tests
+scripts/                runnable demos
 ```
 
 ## Install
@@ -66,10 +74,27 @@ The demo opens a real MCP session against `tests/fixtures/mock_mcp_server.py`
 and prints every message exchanged, labelled as synchronization, request,
 response or error. The same trace is appended to `logs/mcp_protocol_*.jsonl`.
 
+## The pharmacy MCP server
+
+Seven tools: `list_branches`, `search_medicines`, `get_medicine_details`,
+`check_inventory`, `verify_prescription`, `create_purchase_order` and
+`get_order`. Full specification, arguments, error codes and wire examples in
+[docs/pharmacy-mcp-server.md](docs/pharmacy-mcp-server.md).
+
+Run the whole scenario — symptom, medicine details, an antibiotic refused for
+lack of a prescription, prescription check, and the resulting order:
+
+```bash
+python scripts/demo_pharmacy.py
+```
+
+The server is a normal MCP server: it also works from Claude Desktop or any
+other host, see the configuration snippet in the specification.
+
 ## Roadmap
 
 - [x] JSON-RPC 2.0 core, MCP session lifecycle, protocol log
-- [ ] Pharmacy MCP server (local, stdio)
+- [x] Pharmacy MCP server (local, stdio)
 - [ ] Gemini host with conversation context and tool-calling loop
 - [ ] Official Filesystem and Git MCP servers
 - [ ] Textual TUI and written report
