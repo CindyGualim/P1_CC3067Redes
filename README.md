@@ -45,9 +45,17 @@ src/servers/pharmacy/
   __main__.py           entry point of the pharmacy server
   tools.py              the seven tools and their JSON Schemas
   database.py           SQLite layer and the business rules
+src/host/
+  registry.py           one MCP client per configured server, namespaced tools
+  conversation.py       history that keeps the session context
+  agent.py              tool-calling loop and the approval gate
+  llm/schema.py         MCP inputSchema -> Gemini FunctionDeclaration
+  llm/gemini.py         Gemini client, automatic function calling disabled
+src/main.py             console chatbot
+config/servers.json     which MCP servers to launch
 data/pharmacy_seed.json catalogue, inventory and prescriptions
 docs/                   server specification
-tests/                  unit, dispatch and end-to-end tests
+tests/                  unit, dispatch, agent and end-to-end tests
 scripts/                runnable demos
 ```
 
@@ -74,6 +82,42 @@ The demo opens a real MCP session against `tests/fixtures/mock_mcp_server.py`
 and prints every message exchanged, labelled as synchronization, request,
 response or error. The same trace is appended to `logs/mcp_protocol_*.jsonl`.
 
+## Run the chatbot
+
+```bash
+python src/main.py
+```
+
+Needs `GEMINI_API_KEY` in `.env`. Inside the chat: `/servers`, `/tools`,
+`/log [n]`, `/save`, `/reset`, `/help`, `/salir`.
+
+Without a key, the servers and their catalogue can still be inspected:
+
+```bash
+python src/main.py --offline
+```
+
+And once a key is available, this checks the whole path in one shot — schema
+translation, function calling, MCP invocation and context across two turns:
+
+```bash
+python scripts/check_gemini.py
+```
+
+### How a turn works
+
+1. The user writes; the history so far goes to Gemini together with every MCP
+   tool, translated from JSON Schema into function declarations.
+2. If the model answers with function calls, the host runs them against the
+   right server, feeds the results back, and asks the model again.
+3. Anything the server does **not** mark as `readOnlyHint` is confirmed with the
+   user first. Today that is only `create_purchase_order`, the one tool that
+   writes — the host reads that from the protocol, it has no hardcoded list.
+4. The loop stops when the model answers with text, or after `max_steps`.
+
+Automatic function calling in the SDK is disabled on purpose: the tools live
+behind MCP, so the host decides what runs.
+
 ## The pharmacy MCP server
 
 Seven tools: `list_branches`, `search_medicines`, `get_medicine_details`,
@@ -95,7 +139,7 @@ other host, see the configuration snippet in the specification.
 
 - [x] JSON-RPC 2.0 core, MCP session lifecycle, protocol log
 - [x] Pharmacy MCP server (local, stdio)
-- [ ] Gemini host with conversation context and tool-calling loop
+- [x] Gemini host with conversation context and tool-calling loop
 - [ ] Official Filesystem and Git MCP servers
 - [ ] Textual TUI and written report
 - [ ] Remote server on Cloud Run + Wireshark analysis *(delivery 2)*

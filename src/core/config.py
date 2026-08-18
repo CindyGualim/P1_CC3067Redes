@@ -37,7 +37,7 @@ def load_settings(env_file: Path | None = None) -> Settings:
     load_dotenv(env_file or PROJECT_ROOT / ".env", override=False)
     return Settings(
         gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
-        gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-pro"),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
         log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
         request_timeout=float(os.getenv("MCP_REQUEST_TIMEOUT", "60")),
     )

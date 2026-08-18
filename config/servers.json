@@ -1,0 +1,15 @@
+{
+  "$comment": "MCP servers the chatbot connects to. ${PYTHON} and ${PROJECT_ROOT} are expanded at load time so the file works on any machine.",
+  "servers": [
+    {
+      "name": "pharmacy",
+      "description": "Servidor propio: inventario, recetas y ordenes de compra de la cadena Farmacia Vida.",
+      "command": ["${PYTHON}", "${PROJECT_ROOT}/src/servers/pharmacy/__main__.py"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUTF8": "1"
+      },
+      "enabled": true
+    }
+  ]
+}
