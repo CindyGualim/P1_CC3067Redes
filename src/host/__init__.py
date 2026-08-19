@@ -3,6 +3,7 @@
 from host.agent import AgentEvent, ChatAgent, build_system_prompt
 from host.conversation import Conversation
 from host.registry import ServerConfig, ServerRegistry, load_server_configs
+from host.workspace import Workspace, WorkspaceError
 
 __all__ = [
     "AgentEvent",
@@ -12,4 +13,6 @@ __all__ = [
     "ServerConfig",
     "ServerRegistry",
     "load_server_configs",
+    "Workspace",
+    "WorkspaceError",
 ]

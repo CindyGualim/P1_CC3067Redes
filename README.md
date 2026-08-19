@@ -49,6 +49,7 @@ src/host/
   registry.py           one MCP client per configured server, namespaced tools
   conversation.py       history that keeps the session context
   agent.py              tool-calling loop and the approval gate
+  workspace.py          sandbox the official servers are restricted to
   llm/schema.py         MCP inputSchema -> Gemini FunctionDeclaration
   llm/gemini.py         Gemini client, automatic function calling disabled
 src/main.py             console chatbot
@@ -118,6 +119,42 @@ python scripts/check_gemini.py
 Automatic function calling in the SDK is disabled on purpose: the tools live
 behind MCP, so the host decides what runs.
 
+## Official MCP servers
+
+The chatbot also drives the two official Anthropic servers, declared in
+[config/servers.json](config/servers.json) alongside the pharmacy one:
+
+| Server | Command | Tools |
+| --- | --- | --- |
+| `filesystem` | `npx -y @modelcontextprotocol/server-filesystem <workspace>` | 14 |
+| `git` | `python -m mcp_server_git` | 12 |
+
+```bash
+python scripts/demo_official_servers.py
+```
+
+That runs the scenario the statement suggests: prepare a repository, write a
+README through the Filesystem server, stage it with `git_add`, commit it with
+`git_commit` and read the history back with `git_log` — then queries the
+pharmacy server in the same session, to show the three coexisting under one
+host.
+
+Two things worth knowing:
+
+- **The sandbox.** The Filesystem server is started with `workspace/` as its
+  only allowed root, so the chatbot cannot read or write anything else on the
+  machine. Paths outside it come back as an error from the server itself.
+- **The Git server cannot create repositories.** `mcp-server-git` exposes twelve
+  tools and `git_init` is not among them, in any published version. So the host
+  prepares empty repositories inside the sandbox — automatically at startup, or
+  with `/workspace <name>` — and every actual git operation goes through the
+  official server.
+
+The approval gate needed no changes for these servers: they declare
+`readOnlyHint` in their tool annotations, so `write_file`, `edit_file`,
+`git_commit` and friends are confirmed with the user, while `read_file` and
+`git_log` are not.
+
 ## The pharmacy MCP server
 
 Seven tools: `list_branches`, `search_medicines`, `get_medicine_details`,
@@ -140,6 +177,6 @@ other host, see the configuration snippet in the specification.
 - [x] JSON-RPC 2.0 core, MCP session lifecycle, protocol log
 - [x] Pharmacy MCP server (local, stdio)
 - [x] Gemini host with conversation context and tool-calling loop
-- [ ] Official Filesystem and Git MCP servers
+- [x] Official Filesystem and Git MCP servers
 - [ ] Textual TUI and written report
 - [ ] Remote server on Cloud Run + Wireshark analysis *(delivery 2)*

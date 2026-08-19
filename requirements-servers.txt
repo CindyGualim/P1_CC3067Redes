@@ -1,0 +1,15 @@
+# Official MCP servers required by item 4 of the project statement.
+# They are installed separately from requirements.txt on purpose.
+#
+# These are third-party SERVERS that this project drives as external processes.
+# Our own code never imports them, and never imports the `mcp` SDK that
+# mcp-server-git pulls in as a dependency: the protocol is implemented by hand
+# under src/core/. tests/test_no_mcp_sdk.py enforces that rule.
+#
+#   pip install -r requirements-servers.txt
+#
+# The Filesystem server is not listed here because it is a Node package that npx
+# downloads on first use:
+#   npx -y @modelcontextprotocol/server-filesystem <directory>
+
+mcp-server-git>=2026.8.18

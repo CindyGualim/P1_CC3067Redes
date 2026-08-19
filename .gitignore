@@ -9,3 +9,6 @@ venv/
 logs/*
 !logs/.gitkeep
 data/*.db
+
+# Sandbox the official Filesystem and Git servers operate on
+workspace/

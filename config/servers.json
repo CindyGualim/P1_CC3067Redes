@@ -1,5 +1,5 @@
 {
-  "$comment": "MCP servers the chatbot connects to. ${PYTHON} and ${PROJECT_ROOT} are expanded at load time so the file works on any machine.",
+  "$comment": "MCP servers the chatbot connects to. ${PYTHON}, ${PROJECT_ROOT} and ${WORKSPACE} are expanded at load time so the file works on any machine.",
   "servers": [
     {
       "name": "pharmacy",
@@ -9,6 +9,18 @@
         "PYTHONIOENCODING": "utf-8",
         "PYTHONUTF8": "1"
       },
+      "enabled": true
+    },
+    {
+      "name": "filesystem",
+      "description": "Servidor oficial Filesystem (@modelcontextprotocol/server-filesystem), limitado al directorio workspace/.",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "${WORKSPACE}"],
+      "enabled": true
+    },
+    {
+      "name": "git",
+      "description": "Servidor oficial Git (paquete mcp-server-git). Opera sobre los repositorios creados dentro de workspace/.",
+      "command": ["${PYTHON}", "-m", "mcp_server_git"],
       "enabled": true
     }
   ]

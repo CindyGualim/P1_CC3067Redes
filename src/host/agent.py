@@ -22,6 +22,7 @@ from host.conversation import Conversation
 from host.llm.base import LLMClient, LLMError
 from host.messages import LLMTurn, ToolCall, ToolResult
 from host.registry import RegisteredTool, ServerRegistry
+from host.workspace import Workspace
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +62,35 @@ EventSink = Callable[[AgentEvent], None]
 ApprovalCallback = Callable[[ToolCall, RegisteredTool], Awaitable[bool]]
 
 
-def build_system_prompt(registry: ServerRegistry) -> str:
+WORKSPACE_RULES = """
+Ademas de la farmacia tienes acceso a los servidores oficiales de archivos y de
+Git, restringidos al directorio de trabajo {workspace}.
+
+8. Todas las rutas que envies a esas herramientas deben ser absolutas y estar
+   dentro de ese directorio. El servidor de archivos rechaza cualquier otra.
+9. El servidor de Git no puede crear repositorios: trabaja sobre los que ya
+   existen en el directorio de trabajo. Los repositorios disponibles son: {repos}.
+   Si el usuario pide uno nuevo, indicale que lo cree con el comando /workspace.
+10. Para agregar un archivo a un repositorio: escribelo con el servidor de
+    archivos, agregalo con git_add y luego confirma con git_commit."""
+
+
+def build_system_prompt(
+    registry: ServerRegistry, workspace: Optional[Workspace] = None
+) -> str:
     """Base rules plus whatever each server declared in its handshake.
 
     Using the ``instructions`` field of ``initialize`` means a new server can
     teach the assistant how to use it without touching the host's code.
     """
     sections = [BASE_SYSTEM_PROMPT]
+
+    if workspace is not None and {"filesystem", "git"} & set(registry.clients):
+        repos = ", ".join(workspace.list_repos()) or "ninguno todavia"
+        sections.append(
+            WORKSPACE_RULES.format(workspace=workspace.root, repos=repos)
+        )
+
     instructions = registry.instructions()
     if instructions:
         sections.append("\nInstrucciones de los servidores conectados:")

@@ -33,6 +33,7 @@ from host.llm.base import LLMError  # noqa: E402
 from host.llm.gemini import GeminiClient  # noqa: E402
 from host.messages import ToolCall  # noqa: E402
 from host.registry import RegisteredTool, ServerRegistry, load_server_configs  # noqa: E402
+from host.workspace import Workspace, WorkspaceError  # noqa: E402
 
 console = Console()
 
@@ -40,6 +41,8 @@ HELP = """[bold]Comandos[/bold]
   /servers   estado de los servidores MCP conectados
   /tools     herramientas disponibles y a que servidor pertenecen
   /log [n]   ultimos n mensajes JSON-RPC intercambiados (por defecto 15)
+  /workspace          repositorios del area de trabajo
+  /workspace <nombre> crea un repositorio git vacio para que lo use el chatbot
   /save      guarda la conversacion en logs/conversacion.txt
   /reset     borra el contexto y empieza una sesion nueva
   /help      esta ayuda
@@ -147,7 +150,11 @@ def show_log(protocol_logger: ProtocolLogger, count: int = 15) -> None:
 
 
 async def handle_command(
-    line: str, registry: ServerRegistry, conversation: Conversation, plog: ProtocolLogger
+    line: str,
+    registry: ServerRegistry,
+    conversation: Conversation,
+    plog: ProtocolLogger,
+    workspace: Workspace,
 ) -> bool:
     """Return False when the user asked to quit."""
     parts = line.split()
@@ -164,6 +171,16 @@ async def handle_command(
     elif command == "/log":
         count = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 15
         show_log(plog, count)
+    elif command == "/workspace":
+        # The official Git server has no git_init tool, so new repositories are
+        # created here, by the host, inside the sandbox it controls.
+        if len(parts) > 1:
+            try:
+                path = workspace.init_repo(parts[1])
+                console.print(f"[green]Repositorio listo en {path}[/green]")
+            except WorkspaceError as exc:
+                console.print(f"[red]{exc}[/red]")
+        console.print(f"[dim]Area de trabajo: {workspace.describe()}[/dim]")
     elif command == "/reset":
         conversation.reset()
         console.print("[green]Contexto borrado.[/green]")
@@ -181,7 +198,13 @@ async def run(offline: bool) -> int:
     setup_logging(settings.logs_dir, level=settings.log_level, console=False)
     protocol_logger = ProtocolLogger(settings.logs_dir)
 
-    configs = load_server_configs(PROJECT_ROOT / "config" / "servers.json", PROJECT_ROOT)
+    workspace = Workspace(PROJECT_ROOT / "workspace")
+    workspace.ensure()
+    workspace.init_repo()  # the sandbox always has one repository ready to use
+
+    configs = load_server_configs(
+        PROJECT_ROOT / "config" / "servers.json", PROJECT_ROOT, workspace.root
+    )
     registry = ServerRegistry(
         configs, protocol_logger=protocol_logger, request_timeout=settings.request_timeout
     )
@@ -209,7 +232,9 @@ async def run(offline: bool) -> int:
             console.print("[dim]Mientras tanto puede usar: python src/main.py --offline[/dim]")
             return 1
 
-        conversation = Conversation(system_instruction=build_system_prompt(registry))
+        conversation = Conversation(
+            system_instruction=build_system_prompt(registry, workspace)
+        )
         agent = ChatAgent(
             llm,
             registry,
@@ -236,7 +261,9 @@ async def run(offline: bool) -> int:
             if not line:
                 continue
             if line.startswith("/"):
-                if not await handle_command(line, registry, conversation, protocol_logger):
+                if not await handle_command(
+                    line, registry, conversation, protocol_logger, workspace
+                ):
                     break
                 continue
 

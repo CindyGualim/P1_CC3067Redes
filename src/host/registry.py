@@ -15,6 +15,7 @@ import asyncio
 import json
 import logging
 import os
+import shutil
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -71,21 +72,28 @@ class RegisteredTool:
         )
 
 
-def load_server_configs(path: Path, project_root: Path) -> List[ServerConfig]:
+def load_server_configs(
+    path: Path, project_root: Path, workspace: Optional[Path] = None
+) -> List[ServerConfig]:
     """Read the declarations, expanding the placeholders in the commands.
 
-    ``${PYTHON}`` and ``${PROJECT_ROOT}`` keep the file portable: the same
-    config works on another machine without editing absolute paths.
+    ``${PYTHON}``, ``${PROJECT_ROOT}`` and ``${WORKSPACE}`` keep the file
+    portable: the same config works on another machine without editing absolute
+    paths. ``${WORKSPACE}`` is what bounds the official Filesystem server, so it
+    is resolved to a real absolute path rather than pasted as written.
     """
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     replacements = {
         "${PYTHON}": sys.executable,
         "${PROJECT_ROOT}": str(project_root),
+        "${WORKSPACE}": str((workspace or project_root / "workspace").resolve()),
     }
 
     configs: List[ServerConfig] = []
     for entry in raw.get("servers", []):
-        command = [_expand(part, replacements) for part in entry["command"]]
+        command = resolve_executable(
+            [_expand(part, replacements) for part in entry["command"]]
+        )
         configs.append(
             ServerConfig(
                 name=entry["name"],
@@ -106,6 +114,35 @@ def _expand(value: str, replacements: Dict[str, str]) -> str:
     for placeholder, actual in replacements.items():
         value = value.replace(placeholder, actual)
     return os.path.expandvars(value)
+
+
+def resolve_executable(command: List[str]) -> List[str]:
+    """Resolve the program of a command through PATH.
+
+    Needed for the official servers: ``npx`` on Windows is really ``npx.cmd``,
+    and ``create_subprocess_exec`` does not consult PATHEXT the way a shell
+    does, so launching it by bare name fails with WinError 2.
+    """
+    if not command:
+        return command
+
+    program = command[0]
+    if Path(program).exists():
+        return command
+
+    found = shutil.which(program)
+    if found is None and sys.platform == "win32":
+        for extension in (".cmd", ".exe", ".bat"):
+            found = shutil.which(program + extension)
+            if found:
+                break
+    return [found or program, *command[1:]]
+
+
+def executable_missing(command: List[str]) -> bool:
+    return not command or (
+        not Path(command[0]).exists() and shutil.which(command[0]) is None
+    )
 
 
 class ServerRegistry:
@@ -151,6 +188,11 @@ class ServerRegistry:
         )
 
     async def _connect(self, config: ServerConfig) -> None:
+        if executable_missing(config.command):
+            raise FileNotFoundError(
+                f"No se encontro el ejecutable '{config.command[0]}'. "
+                "Instale la dependencia o desactive el servidor en config/servers.json."
+            )
         transport = StdioTransport(
             config.command, name=config.name, env=config.env, cwd=config.cwd
         )
