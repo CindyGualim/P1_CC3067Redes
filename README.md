@@ -52,7 +52,8 @@ src/host/
   workspace.py          sandbox the official servers are restricted to
   llm/schema.py         MCP inputSchema -> Gemini FunctionDeclaration
   llm/gemini.py         Gemini client, automatic function calling disabled
-src/main.py             console chatbot
+src/tui/                Textual interface: layout, widgets, approval dialog
+src/main.py             entry point (Textual by default, --repl for console)
 config/servers.json     which MCP servers to launch
 data/pharmacy_seed.json catalogue, inventory and prescriptions
 docs/                   server specification
@@ -89,21 +90,44 @@ response or error. The same trace is appended to `logs/mcp_protocol_*.jsonl`.
 python src/main.py
 ```
 
-Needs `GEMINI_API_KEY` in `.env`. Inside the chat: `/servers`, `/tools`,
-`/log [n]`, `/save`, `/reset`, `/help`, `/salir`.
+![Interface](docs/img/tui-conversacion.svg)
 
-Without a key, the servers and their catalogue can still be inspected:
+The conversation owns the left column because it is the primary task; the MCP
+log, the servers and the tools sit in tabs on the right, where they can be
+consulted without interrupting the chat. Tool activity is printed inline and
+dimmed, so a pause is always explained.
+
+Needs `GEMINI_API_KEY` in `.env`. Inside the app: `/demo`, `/workspace`,
+`/save`, `/reset`, `/help`, plus F1, Ctrl+R and Ctrl+Q.
+
+**Without a key** everything except the model still works — the servers connect
+and `/demo` runs a full pharmacy scenario, confirmation dialog included:
 
 ```bash
 python src/main.py --offline
 ```
 
-And once a key is available, this checks the whole path in one shot — schema
+There is also a plain console chat, useful for screenshots, for debugging and as
+a fallback if the terminal misbehaves during a demo:
+
+```bash
+python src/main.py --repl
+```
+
+Once a key is available, this checks the whole path in one shot — schema
 translation, function calling, MCP invocation and context across two turns:
 
 ```bash
 python scripts/check_gemini.py
 ```
+
+### Anything that writes is confirmed first
+
+![Confirmation dialog](docs/img/tui-confirmacion.svg)
+
+The host asks before running any tool the server does not mark as
+`readOnlyHint`. The dialog lists the full arguments, so what is confirmed is a
+concrete order; the reversible option holds the focus and Escape cancels.
 
 ### How a turn works
 
@@ -172,11 +196,20 @@ python scripts/demo_pharmacy.py
 The server is a normal MCP server: it also works from Claude Desktop or any
 other host, see the configuration snippet in the specification.
 
+The database is built from `data/pharmacy_seed.json` on first run. Deleting
+`data/pharmacy.db` restores the seeded stock and prescriptions.
+
+## Report
+
+[docs/reporte-entrega1.md](docs/reporte-entrega1.md) covers items 8 and 10 of the
+statement for the local servers: full specification, the error model, the
+interface decisions, the difficulties found and the conclusions.
+
 ## Roadmap
 
 - [x] JSON-RPC 2.0 core, MCP session lifecycle, protocol log
 - [x] Pharmacy MCP server (local, stdio)
 - [x] Gemini host with conversation context and tool-calling loop
 - [x] Official Filesystem and Git MCP servers
-- [ ] Textual TUI and written report
+- [x] Textual TUI and written report
 - [ ] Remote server on Cloud Run + Wireshark analysis *(delivery 2)*

@@ -1,11 +1,12 @@
-"""Console chatbot for the pharmacy MCP host.
+"""Entry point of the pharmacy MCP chatbot.
 
-    python src/main.py             # chat (needs GEMINI_API_KEY)
-    python src/main.py --offline   # connect the servers and inspect them, no LLM
+    python src/main.py             # Textual interface (needs GEMINI_API_KEY)
+    python src/main.py --offline   # same interface, servers only, no LLM
+    python src/main.py --repl      # plain console chat, no full-screen UI
 
-This REPL covers requirements 1, 2 and 3: it talks to Gemini at the API level,
-keeps the conversation context, and shows the MCP log with /log. The Textual TUI
-of the last commit replaces the presentation layer, not this logic.
+Both front-ends drive the same host: the REPL stays because a full-screen app is
+awkward to screenshot and to debug, and it is a safe fallback if the terminal
+does not cooperate during the presentation.
 """
 
 from __future__ import annotations
@@ -284,10 +285,20 @@ def main() -> None:
         action="store_true",
         help="Conecta los servidores MCP y muestra sus herramientas, sin usar el LLM.",
     )
+    parser.add_argument(
+        "--repl",
+        action="store_true",
+        help="Usa el chat de consola simple en lugar de la interfaz Textual.",
+    )
     args = parser.parse_args()
 
     configure_event_loop()
-    sys.exit(asyncio.run(run(args.offline)))
+    if args.repl:
+        sys.exit(asyncio.run(run(args.offline)))
+
+    from tui.app import run_tui  # imported here so --repl does not need Textual
+
+    run_tui(PROJECT_ROOT, offline=args.offline)
 
 
 if __name__ == "__main__":

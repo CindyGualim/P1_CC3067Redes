@@ -1,0 +1,164 @@
+/* Visual language of the chatbot.
+ *
+ * Colour decisions, from the HCI course:
+ *
+ * - Teal-green is the accent for the assistant and for healthy states. Green
+ *   reads as safety and care in a health context, and teal keeps it away from
+ *   the "success/failure" green-red pair used for status.
+ * - Blue is the user. Blue and teal are far enough apart in hue to separate the
+ *   two speakers at a glance, and both survive the common forms of colour
+ *   blindness because they also differ in lightness.
+ * - Amber is reserved for one single meaning: an action that will modify data
+ *   and needs confirmation. Nothing else in the interface is amber, so the
+ *   colour itself carries the warning.
+ * - Red only ever means error. Muted red, not pure #ff0000, which reads as
+ *   alarm and is fatiguing on a dark background.
+ * - The technical panels are deliberately low-contrast grey: they are secondary
+ *   information and must not compete with the conversation.
+ */
+
+Screen {
+    layout: vertical;
+    background: $surface;
+}
+
+/* ---------------------------------------------------------------- layout - */
+#body {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#chat-column {
+    width: 3fr;
+    min-width: 50;
+    border-right: solid $panel-lighten-1;
+}
+
+#side-column {
+    width: 2fr;
+    min-width: 34;
+}
+
+#chat-scroll {
+    height: 1fr;
+    padding: 1 2;
+    scrollbar-size-vertical: 1;
+}
+
+/* -------------------------------------------------------------- messages - */
+.message {
+    margin-bottom: 1;
+    padding: 0 1;
+    width: 100%;
+}
+
+.message-user {
+    color: #bae6fd;
+    border-left: thick #38bdf8;
+}
+
+.message-assistant {
+    color: #e6edf3;
+    border-left: thick #2dd4a7;
+}
+
+/* Tool activity is shown inline, dimmed: the user should be able to see what
+ * the assistant is doing without the mechanics stealing attention. */
+.message-tool {
+    color: #8b9aa6;
+    padding-left: 3;
+    margin-bottom: 0;
+}
+
+.message-error {
+    color: #fca5a5;
+    border-left: thick #f87171;
+}
+
+.message-system {
+    color: #94a3b8;
+    text-style: italic;
+}
+
+/* ----------------------------------------------------------------- input - */
+#composer {
+    height: auto;
+    padding: 0 2 1 2;
+}
+
+#prompt {
+    border: round $panel-lighten-2;
+}
+
+#prompt:focus {
+    border: round #2dd4a7;
+}
+
+#prompt.offline {
+    border: round #f0b429;
+}
+
+/* ------------------------------------------------------------ side panel - */
+#side-column TabbedContent {
+    height: 1fr;
+}
+
+#protocol-table, #servers-table, #tools-table {
+    height: 1fr;
+}
+
+DataTable > .datatable--header {
+    background: $panel;
+    color: #94a3b8;
+    text-style: bold;
+}
+
+#status-bar {
+    height: 1;
+    padding: 0 2;
+    color: #8b9aa6;
+    background: $panel;
+}
+
+/* --------------------------------------------------------- approval modal - */
+ApprovalScreen {
+    align: center middle;
+    /* Dim, do not hide: the user keeps the context of what they are confirming. */
+    background: $surface 55%;
+}
+
+#approval-dialog {
+    width: 72;
+    max-width: 90%;
+    height: auto;
+    padding: 1 2;
+    background: $panel;
+    /* Amber frame: the one and only meaning of this colour in the app. */
+    border: thick #f0b429;
+}
+
+#approval-title {
+    text-style: bold;
+    color: #f0b429;
+    margin-bottom: 1;
+}
+
+#approval-tool {
+    color: #8b9aa6;
+    margin-bottom: 1;
+}
+
+#approval-args {
+    height: auto;
+    max-height: 14;
+    margin-bottom: 1;
+}
+
+#approval-buttons {
+    height: auto;
+    align-horizontal: right;
+}
+
+#approval-buttons Button {
+    margin-left: 2;
+}
