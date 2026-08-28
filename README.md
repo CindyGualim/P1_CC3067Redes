@@ -90,7 +90,7 @@ response or error. The same trace is appended to `logs/mcp_protocol_*.jsonl`.
 python src/main.py
 ```
 
-![Interface](docs/img/tui-conversacion.svg)
+
 
 The conversation owns the left column because it is the primary task; the MCP
 log, the servers and the tools sit in tabs on the right, where they can be
@@ -123,7 +123,7 @@ python scripts/check_gemini.py
 
 ### Anything that writes is confirmed first
 
-![Confirmation dialog](docs/img/tui-confirmacion.svg)
+
 
 The host asks before running any tool the server does not mark as
 `readOnlyHint`. The dialog lists the full arguments, so what is confirmed is a
