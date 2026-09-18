@@ -26,8 +26,12 @@ class Conversation:
     def add_user(self, text: str) -> Message:
         return self._append(Message(role="user", text=text))
 
-    def add_assistant(self, text: str = "", tool_calls: Optional[List[ToolCall]] = None) -> Message:
-        return self._append(Message(role="assistant", text=text, tool_calls=tool_calls or []))
+    def add_assistant(
+        self, text: str = "", tool_calls: Optional[List[ToolCall]] = None, raw_parts: object = None
+    ) -> Message:
+        return self._append(
+            Message(role="assistant", text=text, tool_calls=tool_calls or [], raw_parts=raw_parts)
+        )
 
     def add_tool_results(self, results: List[ToolResult]) -> Message:
         return self._append(Message(role="tool", tool_results=results))

@@ -119,6 +119,9 @@ class MCPClient:
         self.initialize_result = result
         self.server_info = result.serverInfo
         self.protocol_version = result.protocolVersion
+        set_version = getattr(self.transport, "set_protocol_version", None)
+        if set_version is not None:
+            set_version(result.protocolVersion)
 
         # Only after this notification may the server be used.
         await self._notify(Method.INITIALIZED)

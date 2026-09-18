@@ -147,7 +147,9 @@ class ChatAgent:
                 return answer
 
             # The model asked for tools: record the request, run them, loop.
-            self.conversation.add_assistant(text=turn.text, tool_calls=turn.tool_calls)
+            self.conversation.add_assistant(
+                text=turn.text, tool_calls=turn.tool_calls, raw_parts=turn.raw_parts
+            )
             results = [await self._run_tool(call) for call in turn.tool_calls]
             self.conversation.add_tool_results(results)
 

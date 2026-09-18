@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional
 from core.mcp.client import MCPClient
 from core.mcp.protocol_log import ProtocolLogger
 from core.mcp.types import CallToolResult, Tool
+from core.transport.http import HttpTransport
 from core.transport.stdio import StdioTransport
 from host.llm.base import ToolSpec
 
@@ -35,11 +36,14 @@ QUALIFIER = "__"
 @dataclass
 class ServerConfig:
     name: str
-    command: List[str]
+    command: List[str] = field(default_factory=list)
     description: str = ""
     env: Dict[str, str] = field(default_factory=dict)
     cwd: Optional[str] = None
     enabled: bool = True
+    transport: str = "stdio"
+    url: Optional[str] = None
+    headers: Dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -91,8 +95,9 @@ def load_server_configs(
 
     configs: List[ServerConfig] = []
     for entry in raw.get("servers", []):
+        transport = entry.get("transport", "stdio")
         command = resolve_executable(
-            [_expand(part, replacements) for part in entry["command"]]
+            [_expand(part, replacements) for part in entry.get("command", [])]
         )
         configs.append(
             ServerConfig(
@@ -105,6 +110,12 @@ def load_server_configs(
                 },
                 cwd=_expand(entry["cwd"], replacements) if entry.get("cwd") else None,
                 enabled=entry.get("enabled", True),
+                transport=transport,
+                url=_expand(entry["url"], replacements) if entry.get("url") else None,
+                headers={
+                    key: _expand(value, replacements)
+                    for key, value in (entry.get("headers") or {}).items()
+                },
             )
         )
     return configs
@@ -188,14 +199,31 @@ class ServerRegistry:
         )
 
     async def _connect(self, config: ServerConfig) -> None:
-        if executable_missing(config.command):
-            raise FileNotFoundError(
-                f"No se encontro el ejecutable '{config.command[0]}'. "
-                "Instale la dependencia o desactive el servidor en config/servers.json."
+        if config.transport == "http":
+            if not config.url or "${" in config.url:
+                raise ValueError(
+                    f"El servidor remoto '{config.name}' necesita una URL valida."
+                )
+            transport = HttpTransport(
+                config.url,
+                name=config.name,
+                headers=config.headers,
+                timeout=self.request_timeout,
             )
-        transport = StdioTransport(
-            config.command, name=config.name, env=config.env, cwd=config.cwd
-        )
+        elif config.transport == "stdio":
+            if executable_missing(config.command):
+                program = config.command[0] if config.command else "(vacio)"
+                raise FileNotFoundError(
+                    f"No se encontro el ejecutable '{program}'. "
+                    "Instale la dependencia o desactive el servidor en config/servers.json."
+                )
+            transport = StdioTransport(
+                config.command, name=config.name, env=config.env, cwd=config.cwd
+            )
+        else:
+            raise ValueError(
+                f"Transporte no soportado para '{config.name}': {config.transport}"
+            )
         client = MCPClient(
             transport,
             protocol_logger=self.protocol_logger,

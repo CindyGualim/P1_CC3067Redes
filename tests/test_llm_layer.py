@@ -9,7 +9,7 @@ from google.genai import types
 
 from host.conversation import Conversation
 from host.llm.base import ToolSpec
-from host.llm.gemini import to_gemini_contents
+from host.llm.gemini import is_retryable_error, to_gemini_contents
 from host.llm.schema import to_function_declaration, to_gemini_schema, to_gemini_tools
 from host.messages import ToolCall, ToolResult
 
@@ -95,7 +95,11 @@ def test_history_maps_to_user_and_model_roles():
     conversation = Conversation()
     conversation.add_user("hola")
     call = ToolCall(name="pharmacy__list_branches", arguments={})
-    conversation.add_assistant(text="", tool_calls=[call])
+    raw = types.Content(
+        role="model",
+        parts=[types.Part.from_function_call(name=call.name, args=call.arguments)],
+    )
+    conversation.add_assistant(text="", tool_calls=[call], raw_parts=raw)
     conversation.add_tool_results([ToolResult(call=call, text="tres sucursales")])
     conversation.add_assistant(text="Tenemos tres.")
 
@@ -161,3 +165,21 @@ def test_gemini_client_requires_a_key():
 
     with pytest.raises(LLMError, match="GEMINI_API_KEY"):
         GeminiClient(api_key="")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        RuntimeError("HTTP 408 request timeout"),
+        RuntimeError("HTTP 429 quota temporarily exhausted"),
+        RuntimeError("HTTP 503 service unavailable"),
+        RuntimeError("connection reset by peer"),
+        RuntimeError("request timed out"),
+    ],
+)
+def test_temporary_gemini_errors_are_retryable(error):
+    assert is_retryable_error(error) is True
+
+
+def test_invalid_request_is_not_retryable():
+    assert is_retryable_error(RuntimeError("HTTP 400 invalid argument")) is False

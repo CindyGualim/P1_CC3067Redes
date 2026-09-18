@@ -4,12 +4,23 @@
     {
       "name": "pharmacy",
       "description": "Servidor propio: inventario, recetas y ordenes de compra de la cadena Farmacia Vida.",
+      "transport": "stdio",
       "command": ["${PYTHON}", "${PROJECT_ROOT}/src/servers/pharmacy/__main__.py"],
       "env": {
         "PYTHONIOENCODING": "utf-8",
         "PYTHONUTF8": "1"
       },
       "enabled": true
+    },
+    {
+      "name": "pharmacy_remote",
+      "description": "El mismo servidor Pharmacy MCP desplegado mediante Streamable HTTP.",
+      "transport": "http",
+      "url": "${PHARMACY_REMOTE_URL}",
+      "headers": {
+        "Authorization": "Bearer ${MCP_AUTH_TOKEN}"
+      },
+      "enabled": false
     },
     {
       "name": "filesystem",

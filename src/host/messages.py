@@ -53,6 +53,7 @@ class Message:
     text: str = ""
     tool_calls: List[ToolCall] = field(default_factory=list)
     tool_results: List[ToolResult] = field(default_factory=list)
+    raw_parts: Optional[Any] = None
 
 
 @dataclass
@@ -62,6 +63,7 @@ class LLMTurn:
     text: str = ""
     tool_calls: List[ToolCall] = field(default_factory=list)
     usage: Optional[Dict[str, int]] = None
+    raw_parts: Optional[Any] = None
 
     @property
     def wants_tools(self) -> bool:
