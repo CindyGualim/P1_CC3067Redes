@@ -12,3 +12,15 @@ data/*.db
 
 # Sandbox the official Filesystem and Git servers operate on
 workspace/
+
+# Network-analysis artifacts may contain session secrets or private traffic
+captures/
+*.pcap
+*.pcapng
+tls-keys*.log
+
+# Exception: the loopback reference capture is the evidence for item 7. It only
+# carries the throwaway token of scripts/capture_mcp_session.py.
+!captures/
+captures/*
+!captures/mcp-remote-session.pcapng
