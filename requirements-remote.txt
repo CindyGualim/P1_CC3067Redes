@@ -1,0 +1,3 @@
+# Minimal runtime used by the custom Pharmacy MCP server in Cloud Run.
+pydantic>=2.5.0
+
