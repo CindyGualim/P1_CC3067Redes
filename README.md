@@ -33,16 +33,19 @@ src/core/
   config.py             settings loaded from .env
   logging_setup.py      diagnostic logging (file + console)
   transport/
-    base.py             Transport interface (stdio now, HTTP in delivery 2)
+    base.py             Transport interface shared by stdio and HTTP
     stdio.py            client side: runs an MCP server as a child process
     stdio_server.py     server side: stdin/stdout loop
+    http.py             client side: Streamable HTTP to the remote server
+    http_server.py      server side: POST /mcp, bearer auth, /health
   mcp/
     types.py            MCP data model and method names
     client.py           session: handshake, id correlation, tools
     server.py           tool registry, dispatch, schema validation
     protocol_log.py     audit log of every MCP message (requirement #3)
 src/servers/pharmacy/
-  __main__.py           entry point of the pharmacy server
+  __main__.py           entry point of the pharmacy server (stdio)
+  remote.py             entry point of the same server over HTTP (Cloud Run)
   tools.py              the seven tools and their JSON Schemas
   database.py           SQLite layer and the business rules
 src/host/
@@ -56,7 +59,9 @@ src/tui/                Textual interface: layout, widgets, approval dialog
 src/main.py             entry point (Textual by default, --repl for console)
 config/servers.json     which MCP servers to launch
 data/pharmacy_seed.json catalogue, inventory and prescriptions
-docs/                   server specification
+docs/                   server specification and the two written reports
+captures/               Wireshark capture of a remote MCP session
+Dockerfile              image published to Cloud Run
 tests/                  unit, dispatch, agent and end-to-end tests
 scripts/                runnable demos
 ```
@@ -199,11 +204,65 @@ other host, see the configuration snippet in the specification.
 The database is built from `data/pharmacy_seed.json` on first run. Deleting
 `data/pharmacy.db` restores the seeded stock and prescriptions.
 
-## Report
+## The remote pharmacy MCP server
 
-[docs/reporte-entrega1.md](docs/reporte-entrega1.md) covers items 8 and 10 of the
-statement for the local servers: full specification, the error model, the
-interface decisions, the difficulties found and the conclusions.
+The same server also runs over Streamable HTTP, so the chatbot reaches it exactly
+the way it reaches the local one: only the `Transport` implementation changes,
+`tools.py` and `database.py` are untouched.
+
+| Method | Path | Auth | Answer |
+| --- | --- | --- | --- |
+| `POST` | `/mcp` | `Authorization: Bearer <token>` | `200` with the JSON-RPC response, or `202` with no body for a notification |
+| `GET` | `/health` | none | `200` — Cloud Run probe |
+| `OPTIONS` | `/mcp` | none | `204` with `Allow` and CORS headers |
+
+Deploy it and point the chatbot at it:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(32))"   # pick a token
+.\scripts\deploy_cloud_run.ps1 -ProjectId <your-gcp-project> -AuthToken <token>
+```
+
+Then set `PHARMACY_REMOTE_URL` and `MCP_AUTH_TOKEN` in `.env` and flip
+`pharmacy_remote` to `"enabled": true` in
+[config/servers.json](config/servers.json). Disable the local `pharmacy` entry
+for a remote-only demo, or keep both to compare them side by side.
+
+To run it without Docker, for a local test:
+
+```powershell
+$env:MCP_AUTH_TOKEN = "local-token"; $env:PYTHONPATH = "src"
+python -m servers.pharmacy.remote
+```
+
+## Wireshark analysis
+
+```powershell
+python scripts/capture_mcp_session.py    # records captures/mcp-remote-session.pcapng
+python scripts/analyze_capture.py        # classifies every JSON-RPC message
+```
+
+The first script starts the remote server on loopback, records the traffic with
+`tshark` and drives a full MCP session — handshake, `tools/list` and three
+`tools/call`. The second reads the capture back and labels each message as
+synchronisation, request, notification, response or error, then summarises the
+TCP, IP and link-layer view. The `.pcapng` opens in the Wireshark GUI too.
+
+Requirements: Wireshark with Npcap, installed with loopback capture support. An
+elevated shell is only needed if Npcap was installed with the "restrict to
+administrators" option; otherwise a normal terminal works. Add `--url <cloud-run-url>/mcp --token <token> --interface
+"<your Wi-Fi adapter>"` to capture the deployed HTTPS service instead; the
+JSON-RPC bodies are then encrypted, which is why the classification uses the
+cleartext loopback capture.
+
+## Reports
+
+- [docs/reporte-entrega1.md](docs/reporte-entrega1.md) — items 8 and 10 for the
+  local servers: specification, error model, interface decisions, difficulties.
+- [docs/reporte-entrega2.md](docs/reporte-entrega2.md) — items 6, 7, 9 and the
+  remote half of 8 and 10: the HTTP transport, the captured session message by
+  message, and what happens at the link, network, transport and application
+  layers.
 
 ## Roadmap
 
@@ -212,4 +271,5 @@ interface decisions, the difficulties found and the conclusions.
 - [x] Gemini host with conversation context and tool-calling loop
 - [x] Official Filesystem and Git MCP servers
 - [x] Textual TUI and written report
-- [ ] Remote server on Cloud Run + Wireshark analysis *(delivery 2)*
+- [x] Remote server on Cloud Run over Streamable HTTP
+- [x] Wireshark capture and JSON-RPC / per-layer analysis

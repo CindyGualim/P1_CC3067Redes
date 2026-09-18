@@ -13,7 +13,7 @@ import json
 import logging
 import sqlite3
 import unicodedata
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -138,6 +138,25 @@ class PharmacyDatabase:
     # ------------------------------------------------------------------ #
     # Seeding
     # ------------------------------------------------------------------ #
+    @staticmethod
+    def _seed_date(value: str, today: Optional[date] = None) -> str:
+        """Resolve a seed date, which may be absolute or relative to today.
+
+        Prescription validity is a business rule, so a seed with hard-coded
+        dates silently rots: the demo prescription that was valid while the
+        seed was written starts coming back as expired weeks later.  A value
+        written as an offset in days (``"+18"``, ``"-12"``) is resolved when
+        the database is built, so the scenarios stay meaningful whenever the
+        project is run.  An ISO date is returned untouched, which is what the
+        deliberately expired prescription uses -- that one is a fixed
+        historical record and must not move.
+        """
+        text = value.strip()
+        if text and text[0] in "+-":
+            reference = today or date.today()
+            return (reference + timedelta(days=int(text))).isoformat()
+        return text
+
     def _seed(self) -> None:
         seed = json.loads(self.seed_path.read_text(encoding="utf-8"))
         self.currency = seed.get("currency", "GTQ")
@@ -185,8 +204,9 @@ class PharmacyDatabase:
                        VALUES (?,?,?,?,?,?,?,?,?)""",
                     (
                         rx["folio"], rx["patient_name"], rx["patient_id"], rx["doctor_name"],
-                        rx["doctor_license"], rx["diagnosis"], rx["issued_at"],
-                        rx["expires_at"], rx["status"],
+                        rx["doctor_license"], rx["diagnosis"],
+                        self._seed_date(rx["issued_at"]),
+                        self._seed_date(rx["expires_at"]), rx["status"],
                     ),
                 )
                 self.conn.executemany(

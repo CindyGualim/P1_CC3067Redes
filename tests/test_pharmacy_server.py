@@ -82,6 +82,41 @@ def test_seed_loads_once(db, tmp_path):
     again.close()
 
 
+def test_seed_dates_may_be_relative_or_absolute():
+    """Offsets resolve against today; an ISO date is kept verbatim."""
+    reference = date(2026, 9, 21)
+    assert PharmacyDatabase._seed_date("+18", reference) == "2026-10-09"
+    assert PharmacyDatabase._seed_date("-12", reference) == "2026-09-09"
+    assert PharmacyDatabase._seed_date("2026-05-31", reference) == "2026-05-31"
+
+
+def test_demo_prescription_is_valid_whenever_the_project_is_run(db):
+    """RX-2026-0001 is the happy path of every demo, so it must never expire.
+
+    It used to carry absolute dates and silently went stale, which broke the
+    scripted demos while the suite stayed green because the tests moved the
+    expiry themselves.
+    """
+    prescription = db.get_prescription("RX-2026-0001")
+    assert prescription["expires_at"] > date.today().isoformat()
+    assert prescription["issued_at"] <= date.today().isoformat()
+
+    order = db.create_order(
+        branch_id="SUC-01",
+        customer_name="Ana Lucia Morales",
+        customer_id="2547891230101",
+        items=[{"sku": "MED-005", "quantity": 1}],
+        prescription_folio="RX-2026-0001",
+    )
+    assert order["total"] > 0
+
+
+def test_seed_keeps_one_deliberately_expired_prescription(db):
+    """RX-2026-0002 is the counter-example the demo needs; it stays in the past."""
+    prescription = db.get_prescription("RX-2026-0002")
+    assert prescription["expires_at"] < date.today().isoformat()
+
+
 def test_search_by_symptom_ignores_accents(db):
     results = db.search_medicines(symptom="congestión nasal")
     assert {med["sku"] for med in results} >= {"MED-003", "MED-015"}
